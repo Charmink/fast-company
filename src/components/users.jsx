@@ -24,7 +24,6 @@ const Users = () => {
     }
 
     const handlePageChange = (pageIndex) => {
-        console.log(pageIndex)
         setCurrentPage(pageIndex)
     }
 
