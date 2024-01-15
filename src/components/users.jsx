@@ -1,18 +1,31 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import api from "../api"
 import SearchStatus from "./searchStatus";
 import User from "./user";
 import Pagination from "./pagination";
+import GroupList from "./groupList";
+import {filterUsersByProfession} from "../utils/utils";
 
 const Users = () => {
     const [users, setUsers] = useState(api.users.fetchAll());
-    const [currentPage, setCurrentPage] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProfession, setSelectedProfession] = useState();
+    const [professions, setProfessions] = useState();
     const pageSize = 4;
+
+    useEffect(() => {
+        api.professions.fetchAll().then((data) => setProfessions(data));
+    }, [])
+
+    useEffect(() => {
+        setCurrentPage(1)
+        setProfessions(professions)
+    }, [professions]);
 
     const handleDelete = (userId) => {
         setUsers(users.filter(user => user._id !== userId))
-        if (users.length <= pageSize * (currentPage - 1) - 1) {
-            handlePageChange(currentPage - 1)
+        if (filterUsersByProfession(users, selectedProfession).length <= pageSize * (currentPage - 1) + 1) {
+            setCurrentPage(currentPage - 1)
         }
     };
 
@@ -27,32 +40,55 @@ const Users = () => {
         setCurrentPage(pageIndex)
     }
 
+    const handleProfessionSelect = (item) => {
+        setCurrentPage(1)
+        setSelectedProfession(item)
+    }
+
+    const handleFilterReset = () => {
+        setSelectedProfession(null);
+    }
+
     return (
-        <React.Fragment>
-            <SearchStatus count={users.length}/>
-            <table className="table">
-                <thead>
-                <tr>
-                    <th scope="col">Имя</th>
-                    <th scope="col">Качества</th>
-                    <th scope="col">Профессия</th>
-                    <th scope="col">Встречи</th>
-                    <th scope="col">Оценка</th>
-                    <th scope="col">Избранное</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    users.slice(pageSize * (currentPage - 1), currentPage * pageSize).map(user => (
-                        <User key={user._id} {...user} onDelete={handleDelete} onToggleBookMark={handleToggleBookMark}/>
+        <div className="d-flex">
+            {professions && <GroupList
+                items={professions}
+                selectedItem={selectedProfession}
+                onItemSelect={handleProfessionSelect}
+                onFilterReset={handleFilterReset}
+            />}
+            <div className="d-flex flex-column">
+                <SearchStatus count={users.length}/>
+                <table className="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Качества</th>
+                        <th scope="col">Профессия</th>
+                        <th scope="col">Встречи</th>
+                        <th scope="col">Оценка</th>
+                        <th scope="col">Избранное</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        filterUsersByProfession(users, selectedProfession).slice(pageSize * (currentPage - 1), currentPage * pageSize).map(user => (
+                                <User key={user._id} {...user} onDelete={handleDelete}
+                                      onToggleBookMark={handleToggleBookMark}/>
+                            )
                         )
-                    )
-                }
-                </tbody>
-            </table>
-            <Pagination itemsCount={users.length} currentPage={currentPage} pageSize={pageSize} onPageChange={handlePageChange}/>
-        </React.Fragment>
+                    }
+                    </tbody>
+                </table>
+                <div className="d-flex justify-content-center">
+                    <Pagination
+                    itemsCount={filterUsersByProfession(users, selectedProfession).length} currentPage={currentPage}
+                    pageSize={pageSize} onPageChange={handlePageChange}/>
+                </div>
+
+            </div>
+        </div>
     )
 };
 
