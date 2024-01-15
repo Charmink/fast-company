@@ -54,6 +54,6 @@ const Users = () => {
             <Pagination itemsCount={users.length} currentPage={currentPage} pageSize={pageSize} onPageChange={handlePageChange}/>
         </React.Fragment>
     )
-}
+};
 
 export default Users

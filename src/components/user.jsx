@@ -1,6 +1,7 @@
 import React from "react";
 import Bookmark from "./bookmark";
 import Quality from "./quality";
+import PropTypes from "prop-types";
 
 const User = (props) => {
     return (
@@ -33,6 +34,27 @@ const User = (props) => {
 
         </>
     )
-}
+};
+
+User.propTypes = {
+    name: PropTypes.string.isRequired,
+    qualities: PropTypes.arrayOf(
+        PropTypes.shape(
+            {
+                _id: PropTypes.string.isRequired,
+                color: PropTypes.string.isRequired,
+                name: PropTypes.string.isRequired
+            })
+    ).isRequired,
+    profession: PropTypes.shape({
+        name: PropTypes.string.isRequired
+    }).isRequired,
+    completedMeetings: PropTypes.number.isRequired,
+    rate: PropTypes.number.isRequired,
+    bookmark: PropTypes.bool.isRequired,
+    onToggleBookMark: PropTypes.func.isRequired,
+    _id: PropTypes.string.isRequired,
+    onDelete: PropTypes.func.isRequired
+};
 
 export default User;

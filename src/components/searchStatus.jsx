@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const SearchStatus = (props) => {
     const formatPhrase = () => {
@@ -11,6 +12,10 @@ const SearchStatus = (props) => {
             <h1>{formatPhrase()}</h1>
         </>
     )
-}
+};
+
+SearchStatus.propTypes = {
+    count: PropTypes.number.isRequired
+};
 
 export default SearchStatus;
